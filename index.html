@@ -167,7 +167,26 @@
                 .then(text => {
                     document.getElementById('novel-content').innerText = text;
                     let selectedVoice = document.getElementById('select-voice').value;
-                    responsiveVoice.speak(text, selectedVoice);
+                    responsiveVoice.speak(text, selectedVoice, {
+                        onend: function() {
+                            // Increment index for the next text file
+                            currentIndex++;
+                            // If all text files have been read, reset to the beginning
+                            if (currentIndex >= textFiles.length) {
+                                currentIndex = 0;
+                            }
+                            // Load the next text file
+                            let nextText = textFiles[currentIndex];
+                            fetch(nextText)
+                                .then(response => response.text())
+                                .then(nextTextContent => {
+                                    document.getElementById('novel-content').innerText = nextTextContent;
+                                    let nextVoice = document.getElementById('select-voice').value;
+                                    responsiveVoice.speak(nextTextContent, nextVoice);
+                                })
+                                .catch(error => console.error('Error reading next text:', error));
+                        }
+                    });
                 })
                 .catch(error => console.error('Error reading selected text:', error));
         }
