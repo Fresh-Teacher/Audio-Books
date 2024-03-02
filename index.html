@@ -90,28 +90,24 @@
     <script type="text/javascript" src="js/app.js"></script>
     <script>
         function startSpeech() {
-            fetch('novel.txt')
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById('novel-content').innerText = text;
-                    let selectedVoice = document.getElementById('select-voice').value;
-                    responsiveVoice.speak(text, selectedVoice, {onstart: highlightLine});
-                })
-                .catch(error => console.error('Error reading novel.txt:', error));
-        }
+    fetch('novel.txt')
+        .then(response => response.text())
+        .then(text => {
+            // Split the text by paragraphs
+            let paragraphs = text.split(/\n\s*\n/);
+            
+            // Generate HTML for paragraphs
+            let html = paragraphs.map(paragraph => `<p>${paragraph}</p>`).join('');
+            
+            // Display the formatted text in the #novel-content div
+            document.getElementById('novel-content').innerHTML = html;
+            
+            let selectedVoice = document.getElementById('select-voice').value;
+            responsiveVoice.speak(text, selectedVoice);
+        })
+        .catch(error => console.error('Error reading novel.txt:', error));
+}
 
-        function highlightLine() {
-            let novelContent = document.getElementById('novel-content').innerText;
-            let lines = novelContent.split('\n');
-            let currentlyReadingLineIndex = responsiveVoice.isPlaying() ? responsiveVoice.getCurrentParagraph() : -1;
-            document.getElementById('novel-content').innerHTML = lines.map((line, index) => {
-                if (index === currentlyReadingLineIndex) {
-                    return `<span class="highlight">${line}</span>`;
-                } else {
-                    return line;
-                }
-            }).join('\n');
-        }
     </script>
 </body>
 </html>
