@@ -153,38 +153,43 @@
     let currentIndex = 0;
 
     function loadText() {
-        // Get the selected text file from the dropdown menu
-        let selectElement = document.getElementById('select-text');
-        let selectedText = selectElement.options[selectElement.selectedIndex].value;
+    // Get the selected text file from the dropdown menu
+    let selectElement = document.getElementById('select-text');
+    let selectedText = selectElement.options[selectElement.selectedIndex].value;
 
-        fetch(selectedText)
-            .then(response => response.text())
-            .then(text => {
-                document.getElementById('novel-content').innerText = text;
-                let selectedVoice = document.getElementById('select-voice').value;
-                responsiveVoice.speak(text, selectedVoice, {
-                    onend: function() {
-                        // Increment index for the next text file
-                        currentIndex++;
-                        // If all text files have been read, reset to the beginning
-                        if (currentIndex >= textFiles.length) {
-                            currentIndex = 0;
-                        }
-                        // Load the next text file
-                        let nextText = textFiles[currentIndex];
-                        fetch(nextText)
-                            .then(response => response.text())
-                            .then(nextTextContent => {
-                                document.getElementById('novel-content').innerText = nextTextContent;
-                                let nextVoice = document.getElementById('select-voice').value;
-                                responsiveVoice.speak(nextTextContent, nextVoice);
-                            })
-                            .catch(error => console.error('Error reading next text:', error));
-                    }
-                });
-            })
-            .catch(error => console.error('Error reading selected text:', error));
+    fetch(selectedText)
+        .then(response => response.text())
+        .then(text => {
+            document.getElementById('novel-content').innerText = text;
+            let selectedVoice = document.getElementById('select-voice').value;
+            responsiveVoice.speak(text, selectedVoice, {
+                onend: loadNextText // Load the next text file after the current one finishes
+            });
+        })
+        .catch(error => console.error('Error reading selected text:', error));
+}
+
+function loadNextText() {
+    // Increment index for the next text file
+    currentIndex++;
+    // If all text files have been read, reset to the beginning
+    if (currentIndex >= textFiles.length) {
+        currentIndex = 0;
     }
+    // Load the next text file
+    let nextText = textFiles[currentIndex];
+    fetch(nextText)
+        .then(response => response.text())
+        .then(nextTextContent => {
+            document.getElementById('novel-content').innerText = nextTextContent;
+            let nextVoice = document.getElementById('select-voice').value;
+            responsiveVoice.speak(nextTextContent, nextVoice, {
+                onend: loadNextText // Automatically load the next text file when the current one finishes
+            });
+        })
+        .catch(error => console.error('Error reading next text:', error));
+}
+
 </script>
 
 </body>
