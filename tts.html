@@ -13,53 +13,91 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             font-size: 12px; /* Adjust the font size as needed */
-            line-height: 1.; /* Adjust the line height as needed */
-
+            line-height: 1.0; /* Adjust the line height as needed */
         }
+
+        .paragraph-container.highlight {
+    background-color: yellow;
+}
+
+
     </style>
 </head>
 <body>
     <header>
         <div class="topcoat-navigation-bar">
             <div class="topcoat-navigation-bar__item center full">
-                <h1 class="topcoat-navigation-bar__title">ONLINE TTS</h1>
+                <h2 class="topcoat-navigation-bar__title">Jesse <span style="color: rgb(255, 0, 0);">❦</span> Lillian</h1>
             </div>         
         </div>    
-    </header>        
-    
-    <h3 class="checker" onclick="checkSupport()"> Sound Check 🔊 </h3>
-    <section>
-        <div id="novel-content" class="topcoat-textarea mousetrap"></div>             
+    </header>   
+    <h3 class="checker" onclick="checkSupport()">🔊</h3>   
         <div id="customise-options">
             <label id="voice-label">
-                Select voice :
+                Select Voice :
                 <div id="voice-container">
                     <select id="select-voice">
                         <option value="UK English Female">UK Female</option>
                         <option value="UK English Male">UK Male</option>
                         <option value="US English Female">US Female</option>
-                        <option value="US English Male">US Male</option>
+                        <option value="US English Male">USA Female</option>
                         <option value="Australian Female">Australian Female</option>
-                        <option value="Dutch Female">Dutch Female</option>            
-                        <!--        
-                            <option value="7">Hindi Female</option> 
-                        -->
-                        <option value="Japanese Female">Japanese Female</option>
-                        <option value="Korean Female">Korean Female</option>                                    
+                        <option value="Dutch Female">Dutch Male</option>                                             
                     </select>                      
                 </div>
             </label>   
             <label id="speed-label">
-                Select speech speed :
+                Select Speech Speed :
                 <div id="speed-container">
                     <input id="select-speed" type="range" class="topcoat-range" min="0" max="1.5" value="1" step="0.1" onchange="setSpeed(this.value)">
                 </div>
-            </label>                                  
+            </label>   
+     <!-- Add select element for choosing text files -->
+<label id="text-label">
+    <br><b>Select Chapter :</b>
+    <div id="text-container">
+        <select id="select-text">
+            <option value="table of contents.txt">Table of Contents</option>
+            <option value="prologue.txt">Prologue</option>
+            <option value="acknowledgement.txt">Acknowledgement</option>
+            <option value="preface.txt">Preface</option>
+            <option value="aurthors note.txt">Author's Note</option>   
+            <option value="Genesis.txt">Genesis</option>
+            <option value="the first valentine gift.txt">The First Valentine Gift</option>
+            <option value="exodus.txt">Exodus</option>
+            <option value="the surprise invitation.txt">The Surprise Invitation</option>
+            <option value="lillies siblings.txt">Lillie's Siblings</option>
+            <option value="a friend in need is a friend indeed.txt">A Friend in Need is a Friend Indeed</option>
+            <option value="bestie wa me.txt">Bestie Wa Me</option>
+            <option value="the forbidden fruit tastes sweeter.txt">The Forbidden Fruit Tastes Sweeter</option>
+            <option value="honey is sweet but bees bite.txt">Honey is Sweet But Bees Bite</option>
+            <option value="valentines day.txt">Valentine's Day</option>
+            <option value="orb lit dinner.txt">Orb Lit Dinner</option>
+            <option value="party after party.txt">Party After Party</option>
+            <option value="chronicles.txt">Chronicles</option>
+            <option value="for god and my love.txt">For God and my Love</option>
+            <option value="it is what it is.txt">It Is What It Is</option>
+            <option value="1000 names of lillian.txt">1000 Names of Lillian</option>
+            <option value="partners in crime.txt">Partners in Crime</option>
+            <option value="my birthday party.txt">My Birthday Party</option>
+            <option value="let sleeping dogs lie.txt">Let Sleeping Dogs Lie</option>
+            <option value="love at first sight.txt">Love at First Sight</option>
+            <option value="lamentations.txt">Lamentations</option>
+            <option value="love at last.txt">Love at Last</option>
+            <option value="MYOB.txt">MYOB</option>
+            <option value="Revelation.txt">Revelation</option>
+        </select>
+    </div>
+</label>                                  
+
         </div>
         <div class="button-row">
             <button id="stop-button" class="topcoat-button" onclick="stopSpeech()">STOP</button>
-            <button id="speak-button" class="topcoat-button--cta" onclick="startSpeech()">SPEAK</button>            
-        </div>
+            <button id="speak-button" class="topcoat-button--cta" onclick="loadText()">READ</button>            
+        </div>      
+    <section>
+        <div id="novel-content" class="topcoat-textarea mousetrap">Select a chapter from the dropdown menu and click on the "READ" button to load its contents here...</div>             
+
         <div id="links">
             <ul>
                 <li>
@@ -74,46 +112,180 @@
         </div>
     </section>
     <br>
-     <!-- Footer -->
+   <!-- Footer -->
     
-     <footer class="footer" id="contact">
+   <footer class="footer" id="contact">
     
-        <div class="container">
+    <div class="container">
 
-            <p>&copy; Jesse and Family <br>All feelings reserved <span id="currentYear"></span></p>
+        <p>&copy; Jesse and Family <br>All feelings reserved <span id="currentYear"></span></p>
 
 
-        </div>
+    </div>
 
-    </footer>
+</footer>
+
+<!-- End of Footer -->
     <script src="https://code.responsivevoice.org/responsivevoice.js?key=R06QTECg"></script>
     <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
     <script type="text/javascript" src="js/mousetrap.min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
     <script>
-        function startSpeech() {
-            fetch('novel.txt')
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById('novel-content').innerText = text;
-                    let selectedVoice = document.getElementById('select-voice').value;
-                    responsiveVoice.speak(text, selectedVoice, {onstart: highlightLine});
-                })
-                .catch(error => console.error('Error reading novel.txt:', error));
-        }
+       // List of text files in chronological order
+const textFiles = [
+    "table of contents.txt",
+    "prologue.txt",
+    "acknowledgement.txt",
+    "preface.txt",
+    "aurthors note.txt",
+    "Genesis.txt",
+    "the first valentine gift.txt",
+    "exodus.txt",
+    "the surprise invitation.txt",
+    "lillies siblings.txt",
+    "a friend in need is a friend indeed.txt",
+    "bestie wa me.txt",
+    "the forbidden fruit tastes sweeter.txt",
+    "honey is sweet but bees bite.txt",
+    "valentines day.txt",
+    "party after party.txt",
+    "chronicles.txt",
+    "for god and my love.txt",
+    "it is what it is.txt",
+    "1000 1000 names of lillian.txt",
+    "my birthday party.txt",
+    "let sleeping dogs lie.txt",
+    "love at first sight.txt",
+    "lamentations.txt",
+    "love at last.txt",
+    "MYOB.txt",
+    "Revelation.txt"
+];
 
-        function highlightLine() {
-            let novelContent = document.getElementById('novel-content').innerText;
-            let lines = novelContent.split('\n');
-            let currentlyReadingLineIndex = responsiveVoice.isPlaying() ? responsiveVoice.getCurrentParagraph() : -1;
-            document.getElementById('novel-content').innerHTML = lines.map((line, index) => {
-                if (index === currentlyReadingLineIndex) {
-                    return `<span class="highlight">${line}</span>`;
-                } else {
-                    return line;
+// Index to keep track of the current text file being read
+let currentIndex = 0;
+
+function loadText() {
+    // Get the selected text file from the dropdown menu
+    let selectElement = document.getElementById('select-text');
+    let selectedText = selectElement.options[selectElement.selectedIndex].value;
+
+    fetch(selectedText)
+        .then(response => response.text())
+        .then(text => {
+            document.getElementById('novel-content').innerHTML = ''; // Clear previous content
+            let paragraphs = text.split('\n\n'); // Split text into paragraphs
+
+            // Loop through paragraphs to create paragraph elements
+            for (let i = 0; i < paragraphs.length; i++) {
+                let paragraph = paragraphs[i];
+                let paragraphContainer = document.createElement('div'); // Create container for paragraph
+                paragraphContainer.classList.add('paragraph-container'); // Add class to container for styling
+                let paragraphElement = document.createElement('p');
+                paragraphElement.innerText = paragraph;
+                paragraphContainer.appendChild(paragraphElement); // Append paragraph to container
+                document.getElementById('novel-content').appendChild(paragraphContainer);
+            }
+
+            let selectedVoice = document.getElementById('select-voice').value;
+            let audioContext = new AudioContext();
+            let source = audioContext.createBufferSource();
+
+            let currentIndex = 0; // Track current paragraph index
+
+            responsiveVoice.speak(text, selectedVoice, {
+                onstart: function () {
+                    // Register media session
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.metadata = new MediaMetadata({
+                            title: 'TTS Voice', // Title of the audio
+                            artist: 'Jesse & Lillian', // Artist/Author name
+                            album: 'Online TTS' // Your app name
+                        });
+
+                        navigator.mediaSession.setActionHandler('pause', function () {
+                            responsiveVoice.pause();
+                        });
+
+                        navigator.mediaSession.setActionHandler('play', function () {
+                            responsiveVoice.resume();
+                        });
+
+                        navigator.mediaSession.setActionHandler('stop', function () {
+                            responsiveVoice.cancel();
+                        });
+                    }
+                },
+                onsentenceend: function () {
+                    // Apply highlight class to the current paragraph container
+                    let containers = document.getElementsByClassName('paragraph-container');
+                    for (let i = 0; i < containers.length; i++) {
+                        containers[i].classList.remove('highlight');
+                    }
+                    containers[currentIndex].classList.add('highlight');
+                    currentIndex++;
+                },
+                onend: function () {
+                    // Remove highlight class when reading is completed
+                    let containers = document.getElementsByClassName('paragraph-container');
+                    for (let i = 0; i < containers.length; i++) {
+                        containers[i].classList.remove('highlight');
+                    }
                 }
-            }).join('\n');
-        }
+            });
+        })
+        .catch(error => console.error('Error reading selected text:', error));
+}
+
+
+// Handle visibility change to pause/resume audio playback
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === 'hidden') {
+        // Pause audio playback when the application goes into the background
+        responsiveVoice.pause();
+    } else {
+        // Resume audio playback when the application returns to the foreground
+        responsiveVoice.resume();
+    }
+});
+
+// Request a wake lock
+let wakeLock = null;
+async function requestWakeLock() {
+    try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        console.log('Wake Lock acquired');
+    } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+    }
+}
+
+// Call requestWakeLock() when TTS starts playing
+requestWakeLock();
+
+// Release the wake lock when TTS stops playing
+function releaseWakeLock() {
+    if (wakeLock !== null) {
+        wakeLock.release().then(() => {
+            wakeLock = null;
+            console.log('Wake Lock released');
+        });
+    }
+}
+
+// Handle visibility change to pause/resume audio playback
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === 'hidden') {
+        // Pause audio playback when the application goes into the background
+        responsiveVoice.pause();
+    } else {
+        // Resume audio playback when the application returns to the foreground
+        responsiveVoice.resume();
+    }
+});
+
+ 
     </script>
+    
 </body>
 </html>
