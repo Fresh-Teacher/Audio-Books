@@ -58,7 +58,7 @@ var stopSpeech = function() {
 
 var checkSupport = function() {
     if(responsiveVoice.voiceSupport()) {
-        responsiveVoice.speak("Congratulations! You can listen to the book of Jesse and Lillian online. Click on the Speak Button to start listening.");
+        responsiveVoice.speak("Congratulations! You can listen to the book of Jesse and Lillian online. Click on the Read Button to start listening.");
     }
     else{
         alert("Congratulations! Your browser doesn't support Listening to the book of Jesse and Lillian online.");
