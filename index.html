@@ -21,7 +21,7 @@
     <header style="position: fixed; width: 100%; top: 0; z-index: 100;">
         <div class="topcoat-navigation-bar">
             <div class="topcoat-navigation-bar__item center full">
-                <h2 class="topcoat-navigation-bar__title">THE <span style="color: rgb(255, 0, 0);">❦</span> BIBLE</h2>
+                <h2 class="topcoat-navigation-bar__title">THE <span style="color: rgb(255, 0, 0);">L❦VE</span> BIBLE</h2>
             </div>         
         </div>    
     </header>
@@ -125,73 +125,81 @@
     <script type="text/javascript" src="js/mousetrap.min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
     <script>
-        // List of text files in chronological order
-        const textFiles = [
-            "table of contents.txt",
-            "prologue.txt",
-            "acknowledgement.txt",
-            "preface.txt",
-            "aurthors note.txt",
-            "Genesis.txt",
-            "the first valentine gift.txt",
-            "exodus.txt",
-            "the surprise invitation.txt",
-            "lillies siblings.txt",
-            "a friend in need is a friend indeed.txt",
-            "bestie wa me.txt",
-            "the forbidden fruit tastes sweeter.txt",
-            "honey is sweet but bees bite.txt",
-            "valentines day.txt",
-            "party after party.txt",
-            "chronicles.txt",
-            "for god and my love.txt",
-            "it is what it is.txt",
-            "1000 1000 names of lillian.txt",
-            "my birthday party.txt",
-            "let sleeping dogs lie.txt",
-            "love at first sight.txt",
-            "lamentations.txt",
-            "love at last.txt",
-            "MYOB.txt",
-            "Revelation.txt"
-        ];
+       // List of text files in chronological order
+const textFiles = [
+    "table of contents.txt",
+    "prologue.txt",
+    "acknowledgement.txt",
+    "preface.txt",
+    "aurthors note.txt",
+    "Genesis.txt",
+    "the first valentine gift.txt",
+    "exodus.txt",
+    "the surprise invitation.txt",
+    "lillies siblings.txt",
+    "a friend in need is a friend indeed.txt",
+    "bestie wa me.txt",
+    "the forbidden fruit tastes sweeter.txt",
+    "honey is sweet but bees bite.txt",
+    "valentines day.txt",
+    "party after party.txt",
+    "chronicles.txt",
+    "for god and my love.txt",
+    "it is what it is.txt",
+    "1000 1000 names of lillian.txt",
+    "my birthday party.txt",
+    "let sleeping dogs lie.txt",
+    "love at first sight.txt",
+    "lamentations.txt",
+    "love at last.txt",
+    "MYOB.txt",
+    "Revelation.txt"
+];
+
+// Index to keep track of the current text file being read
+let currentIndex = 0;
+
+function loadText() {
+    // Get the selected text file from the dropdown menu
+    let selectElement = document.getElementById('select-text');
+    let selectedText = selectElement.options[selectElement.selectedIndex].value;
     
-        // Index to keep track of the current text file being read
-        let currentIndex = 0;
-    
-        function loadText() {
-            // Get the selected text file from the dropdown menu
-            let selectElement = document.getElementById('select-text');
-            let selectedText = selectElement.options[selectElement.selectedIndex].value;
-            
-            fetch(selectedText)
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById('novel-content').innerText = text;
-                    let selectedVoice = document.getElementById('select-voice').value;
-                    responsiveVoice.speak(text, selectedVoice, {
-                        onend: function() {
-                            // Increment index for the next text file
-                            currentIndex++;
-                            // If all text files have been read, reset to the beginning
-                            if (currentIndex >= textFiles.length) {
-                                currentIndex = 0;
+    fetch(selectedText)
+        .then(response => response.text())
+        .then(text => {
+            document.getElementById('novel-content').innerText = text;
+            let selectedVoice = document.getElementById('select-voice').value;
+            responsiveVoice.speak(text, selectedVoice, {
+                onend: function() {
+                    // Increment index for the next text file
+                    currentIndex++;
+                    // If all text files have been read, reset to the beginning
+                    if (currentIndex >= textFiles.length) {
+                        currentIndex = 0;
+                    }
+                    // Load the next text file
+                    let nextText = textFiles[currentIndex];
+                    fetch(nextText)
+                        .then(response => response.text())
+                        .then(nextTextContent => {
+                            document.getElementById('novel-content').innerText = nextTextContent;
+                            let nextVoice = document.getElementById('select-voice').value;
+                            responsiveVoice.speak(nextTextContent, nextVoice);
+                            // Update the selected option in the dropdown menu
+                            for (let i = 0; i < selectElement.options.length; i++) {
+                                if (selectElement.options[i].value === nextText) {
+                                    selectElement.selectedIndex = i;
+                                    break;
+                                }
                             }
-                            // Load the next text file
-                            let nextText = textFiles[currentIndex];
-                            fetch(nextText)
-                                .then(response => response.text())
-                                .then(nextTextContent => {
-                                    document.getElementById('novel-content').innerText = nextTextContent;
-                                    let nextVoice = document.getElementById('select-voice').value;
-                                    responsiveVoice.speak(nextTextContent, nextVoice);
-                                })
-                                .catch(error => console.error('Error reading next text:', error));
-                        }
-                    });
-                })
-                .catch(error => console.error('Error reading selected text:', error));
-        }
+                        })
+                        .catch(error => console.error('Error reading next text:', error));
+                }
+            });
+        })
+        .catch(error => console.error('Error reading selected text:', error));
+}
+
     </script>
     
 </body>
