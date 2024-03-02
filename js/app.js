@@ -66,7 +66,7 @@ var checkSupport = function() {
 }
 
 var info = function() {
-    alert("How to listen to the book: \n\n1. Click the 'SPEAK' button to access the book contents.\n\n2. Select your preferred voice and speech speed from the dropdown menus.\n\n3. The text will be read aloud using the selected voice.\n\n4. You can stop the speech at any time by clicking the 'STOP' button.\n\n5. Explore more features and information by clicking on the icon of Jesse and Lillian.\n\n6. Select your desired chapter by selecting it from the drop down menu. \n\nEnjoy! 😊");
+    alert("How to listen to the book: \n\n1. Click the 'READ' button to access the book contents.\n\n2. Select your preferred voice and speech speed from the dropdown menus.\n\n3. The text will be read aloud using the selected voice.\n\n4. You can stop the speech at any time by clicking the 'STOP' button.\n\n5. Explore more features and information by clicking on the icon of Jesse and Lillian.\n\n6. Select your desired chapter by selecting it from the drop down menu. \n\nEnjoy! 😊");
 }
 Mousetrap.bind('i', function() { 
     var x = document.getElementById("ttsInput");

@@ -144,7 +144,7 @@
             "chronicles.txt",
             "for god and my love.txt",
             "it is what it is.txt",
-            "1000 names of lillian.txt",
+            "1000 1000 names of lillian.txt",
             "my birthday party.txt",
             "let sleeping dogs lie.txt",
             "love at first sight.txt",
@@ -158,27 +158,16 @@
         let currentIndex = 0;
     
         function loadText() {
-            if (currentIndex >= textFiles.length) {
-                // If all text files have been read, reset to the beginning
-                currentIndex = 0;
-            }
-    
-            // Get the path of the current text file
-            let currentTextFile = textFiles[currentIndex];
-    
-            fetch(currentTextFile)
+            // Get the selected text file from the dropdown menu
+            let selectElement = document.getElementById('select-text');
+            let selectedText = selectElement.options[selectElement.selectedIndex].value;
+            
+            fetch(selectedText)
                 .then(response => response.text())
                 .then(text => {
                     document.getElementById('novel-content').innerText = text;
                     let selectedVoice = document.getElementById('select-voice').value;
-                    responsiveVoice.speak(text, selectedVoice, {
-                        onend: function() {
-                            // Increment index for the next text file
-                            currentIndex++;
-                            // Load the next text file
-                            loadText();
-                        }
-                    });
+                    responsiveVoice.speak(text, selectedVoice);
                 })
                 .catch(error => console.error('Error reading selected text:', error));
         }
