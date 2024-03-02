@@ -15,6 +15,12 @@
             font-size: 12px; /* Adjust the font size as needed */
             line-height: 1.0; /* Adjust the line height as needed */
         }
+
+        .paragraph-container.highlight {
+    background-color: yellow;
+}
+
+
     </style>
 </head>
 <body>
@@ -167,10 +173,25 @@ function loadText() {
     fetch(selectedText)
         .then(response => response.text())
         .then(text => {
-            document.getElementById('novel-content').innerText = text;
+            document.getElementById('novel-content').innerHTML = ''; // Clear previous content
+            let paragraphs = text.split('\n\n'); // Split text into paragraphs
+
+            // Loop through paragraphs to create paragraph elements
+            for (let i = 0; i < paragraphs.length; i++) {
+                let paragraph = paragraphs[i];
+                let paragraphContainer = document.createElement('div'); // Create container for paragraph
+                paragraphContainer.classList.add('paragraph-container'); // Add class to container for styling
+                let paragraphElement = document.createElement('p');
+                paragraphElement.innerText = paragraph;
+                paragraphContainer.appendChild(paragraphElement); // Append paragraph to container
+                document.getElementById('novel-content').appendChild(paragraphContainer);
+            }
+
             let selectedVoice = document.getElementById('select-voice').value;
             let audioContext = new AudioContext();
             let source = audioContext.createBufferSource();
+
+            let currentIndex = 0; // Track current paragraph index
 
             responsiveVoice.speak(text, selectedVoice, {
                 onstart: function () {
@@ -195,26 +216,21 @@ function loadText() {
                         });
                     }
                 },
-                onend: function () {
-                    // Increment index for the next text file
-                    currentIndex++;
-                    // If all text files have been read, reset to the beginning
-                    if (currentIndex >= textFiles.length) {
-                        currentIndex = 0;
+                onsentenceend: function () {
+                    // Apply highlight class to the current paragraph container
+                    let containers = document.getElementsByClassName('paragraph-container');
+                    for (let i = 0; i < containers.length; i++) {
+                        containers[i].classList.remove('highlight');
                     }
-                    // Load the next text file
-                    let nextText = textFiles[currentIndex];
-                    fetch(nextText)
-                        .then(response => response.text())
-                        .then(nextTextContent => {
-                            document.getElementById('novel-content').innerText = nextTextContent;
-                            let nextVoice = document.getElementById('select-voice').value;
-                            // Update the dropdown menu to reflect the currently playing text file
-                            let nextChapterIndex = textFiles.findIndex(file => file === nextText);
-                            selectElement.selectedIndex = nextChapterIndex;
-                            responsiveVoice.speak(nextTextContent, nextVoice);
-                        })
-                        .catch(error => console.error('Error reading next text:', error));
+                    containers[currentIndex].classList.add('highlight');
+                    currentIndex++;
+                },
+                onend: function () {
+                    // Remove highlight class when reading is completed
+                    let containers = document.getElementsByClassName('paragraph-container');
+                    for (let i = 0; i < containers.length; i++) {
+                        containers[i].classList.remove('highlight');
+                    }
                 }
             });
         })
@@ -256,6 +272,18 @@ function releaseWakeLock() {
         });
     }
 }
+
+// Handle visibility change to pause/resume audio playback
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === 'hidden') {
+        // Pause audio playback when the application goes into the background
+        responsiveVoice.pause();
+    } else {
+        // Resume audio playback when the application returns to the foreground
+        responsiveVoice.resume();
+    }
+});
+
  
     </script>
     
