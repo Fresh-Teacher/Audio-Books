@@ -157,7 +157,6 @@ const textFiles = [
 // Index to keep track of the current text file being read
 let currentIndex = 0;
 
-// Update your loadText() function to register media session and play audio
 function loadText() {
     // Get the selected text file from the dropdown menu
     let selectElement = document.getElementById('select-text');
@@ -209,7 +208,8 @@ function loadText() {
                             document.getElementById('novel-content').innerText = nextTextContent;
                             let nextVoice = document.getElementById('select-voice').value;
                             // Update the dropdown menu to reflect the currently playing text file
-                            selectElement.value = nextText;
+                            let nextChapterIndex = textFiles.findIndex(file => file === nextText);
+                            selectElement.selectedIndex = nextChapterIndex;
                             responsiveVoice.speak(nextTextContent, nextVoice);
                         })
                         .catch(error => console.error('Error reading next text:', error));
@@ -218,6 +218,7 @@ function loadText() {
         })
         .catch(error => console.error('Error reading selected text:', error));
 }
+
 
 // Handle visibility change to pause/resume audio playback
 document.addEventListener("visibilitychange", function() {
