@@ -157,39 +157,91 @@
         // Index to keep track of the current text file being read
         let currentIndex = 0;
     
-        function loadText() {
-            // Get the selected text file from the dropdown menu
-            let selectElement = document.getElementById('select-text');
-            let selectedText = selectElement.options[selectElement.selectedIndex].value;
-            
-            fetch(selectedText)
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById('novel-content').innerText = text;
-                    let selectedVoice = document.getElementById('select-voice').value;
-                    responsiveVoice.speak(text, selectedVoice, {
-                        onend: function() {
-                            // Increment index for the next text file
-                            currentIndex++;
-                            // If all text files have been read, reset to the beginning
-                            if (currentIndex >= textFiles.length) {
-                                currentIndex = 0;
-                            }
-                            // Load the next text file
-                            let nextText = textFiles[currentIndex];
-                            fetch(nextText)
-                                .then(response => response.text())
-                                .then(nextTextContent => {
-                                    document.getElementById('novel-content').innerText = nextTextContent;
-                                    let nextVoice = document.getElementById('select-voice').value;
-                                    responsiveVoice.speak(nextTextContent, nextVoice);
-                                })
-                                .catch(error => console.error('Error reading next text:', error));
-                        }
-                    });
-                })
-                .catch(error => console.error('Error reading selected text:', error));
-        }
+      // Update your loadText() function to register media session and play audio
+
+function loadText() {
+    // Get the selected text file from the dropdown menu
+    let selectElement = document.getElementById('select-text');
+    let selectedText = selectElement.options[selectElement.selectedIndex].value;
+
+    fetch(selectedText)
+        .then(response => response.text())
+        .then(text => {
+            document.getElementById('novel-content').innerText = text;
+            let selectedVoice = document.getElementById('select-voice').value;
+            responsiveVoice.speak(text, selectedVoice, {
+                onstart: function () {
+                    // Register media session
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.metadata = new MediaMetadata({
+                            title: 'TTS Voice', // Title of the audio
+                            artist: 'Jesse & Lillian', // Artist/Author name
+                            album: 'Online TTS' // Your app name
+                        });
+
+                        navigator.mediaSession.setActionHandler('pause', function () {
+                            responsiveVoice.pause();
+                        });
+
+                        navigator.mediaSession.setActionHandler('play', function () {
+                            responsiveVoice.resume();
+                        });
+
+                        navigator.mediaSession.setActionHandler('stop', function () {
+                            responsiveVoice.cancel();
+                        });
+                    }
+                },
+                onend: function () {
+                    // Increment index for the next text file
+                    currentIndex++;
+                    // If all text files have been read, reset to the beginning
+                    if (currentIndex >= textFiles.length) {
+                        currentIndex = 0;
+                    }
+                    // Load the next text file
+                    let nextText = textFiles[currentIndex];
+                    fetch(nextText)
+                        .then(response => response.text())
+                        .then(nextTextContent => {
+                            document.getElementById('novel-content').innerText = nextTextContent;
+                            let nextVoice = document.getElementById('select-voice').value;
+                            // Update the dropdown menu to reflect the currently playing text file
+                            selectElement.value = nextText;
+                            responsiveVoice.speak(nextTextContent, nextVoice);
+                        })
+                        .catch(error => console.error('Error reading next text:', error));
+                }
+            });
+        })
+        .catch(error => console.error('Error reading selected text:', error));
+}
+
+
+        // Request a wake lock
+let wakeLock = null;
+async function requestWakeLock() {
+    try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        console.log('Wake Lock acquired');
+    } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+    }
+}
+
+// Call requestWakeLock() when TTS starts playing
+requestWakeLock();
+
+// Release the wake lock when TTS stops playing
+function releaseWakeLock() {
+    if (wakeLock !== null) {
+        wakeLock.release().then(() => {
+            wakeLock = null;
+            console.log('Wake Lock released');
+        });
+    }
+}
+        
     </script>
     
 </body>
