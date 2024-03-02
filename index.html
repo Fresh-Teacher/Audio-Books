@@ -24,11 +24,8 @@
                 <h2 class="topcoat-navigation-bar__title">Jesse <span style="color: rgb(255, 0, 0);">❦</span> Lillian</h1>
             </div>         
         </div>    
-    </header>        
-    
-    <h3 class="checker" onclick="checkSupport()">🔊</h3>
-    <section>
-        <div id="novel-content" class="topcoat-textarea mousetrap">Select a chapter from the dropdown menu and click on the "READ" button to load its contents here...</div>             
+    </header>   
+    <h3 class="checker" onclick="checkSupport()">🔊</h3>   
         <div id="customise-options">
             <label id="voice-label">
                 Select Voice :
@@ -51,7 +48,7 @@
             </label>   
      <!-- Add select element for choosing text files -->
 <label id="text-label">
-    <br>Select Chapter :
+    <br><b>Select Chapter :</b>
     <div id="text-container">
         <select id="select-text">
             <option value="table of contents.txt">Table of Contents</option>
@@ -89,7 +86,10 @@
         <div class="button-row">
             <button id="stop-button" class="topcoat-button" onclick="stopSpeech()">STOP</button>
             <button id="speak-button" class="topcoat-button--cta" onclick="loadText()">READ</button>            
-        </div>
+        </div>      
+    <section>
+        <div id="novel-content" class="topcoat-textarea mousetrap">Select a chapter from the dropdown menu and click on the "READ" button to load its contents here...</div>             
+
         <div id="links">
             <ul>
                 <li>
