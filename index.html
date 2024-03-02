@@ -123,42 +123,41 @@
     <script type="text/javascript" src="js/mousetrap.min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
     <script>
-        // List of text files in chronological order
-        const textFiles = [
-            "table of contents.txt",
-            "prologue.txt",
-            "acknowledgement.txt",
-            "preface.txt",
-            "aurthors note.txt",
-            "Genesis.txt",
-            "the first valentine gift.txt",
-            "exodus.txt",
-            "the surprise invitation.txt",
-            "lillies siblings.txt",
-            "a friend in need is a friend indeed.txt",
-            "bestie wa me.txt",
-            "the forbidden fruit tastes sweeter.txt",
-            "honey is sweet but bees bite.txt",
-            "valentines day.txt",
-            "party after party.txt",
-            "chronicles.txt",
-            "for god and my love.txt",
-            "it is what it is.txt",
-            "1000 1000 names of lillian.txt",
-            "my birthday party.txt",
-            "let sleeping dogs lie.txt",
-            "love at first sight.txt",
-            "lamentations.txt",
-            "love at last.txt",
-            "MYOB.txt",
-            "Revelation.txt"
-        ];
-    
-        // Index to keep track of the current text file being read
-        let currentIndex = 0;
-    
-      // Update your loadText() function to register media session and play audio
+       // List of text files in chronological order
+const textFiles = [
+    "table of contents.txt",
+    "prologue.txt",
+    "acknowledgement.txt",
+    "preface.txt",
+    "aurthors note.txt",
+    "Genesis.txt",
+    "the first valentine gift.txt",
+    "exodus.txt",
+    "the surprise invitation.txt",
+    "lillies siblings.txt",
+    "a friend in need is a friend indeed.txt",
+    "bestie wa me.txt",
+    "the forbidden fruit tastes sweeter.txt",
+    "honey is sweet but bees bite.txt",
+    "valentines day.txt",
+    "party after party.txt",
+    "chronicles.txt",
+    "for god and my love.txt",
+    "it is what it is.txt",
+    "1000 1000 names of lillian.txt",
+    "my birthday party.txt",
+    "let sleeping dogs lie.txt",
+    "love at first sight.txt",
+    "lamentations.txt",
+    "love at last.txt",
+    "MYOB.txt",
+    "Revelation.txt"
+];
 
+// Index to keep track of the current text file being read
+let currentIndex = 0;
+
+// Update your loadText() function to register media session and play audio
 function loadText() {
     // Get the selected text file from the dropdown menu
     let selectElement = document.getElementById('select-text');
@@ -169,6 +168,9 @@ function loadText() {
         .then(text => {
             document.getElementById('novel-content').innerText = text;
             let selectedVoice = document.getElementById('select-voice').value;
+            let audioContext = new AudioContext();
+            let source = audioContext.createBufferSource();
+
             responsiveVoice.speak(text, selectedVoice, {
                 onstart: function () {
                     // Register media session
@@ -217,8 +219,18 @@ function loadText() {
         .catch(error => console.error('Error reading selected text:', error));
 }
 
+// Handle visibility change to pause/resume audio playback
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === 'hidden') {
+        // Pause audio playback when the application goes into the background
+        responsiveVoice.pause();
+    } else {
+        // Resume audio playback when the application returns to the foreground
+        responsiveVoice.resume();
+    }
+});
 
-        // Request a wake lock
+// Request a wake lock
 let wakeLock = null;
 async function requestWakeLock() {
     try {
@@ -241,7 +253,7 @@ function releaseWakeLock() {
         });
     }
 }
-        
+ 
     </script>
     
 </body>
