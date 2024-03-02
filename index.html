@@ -28,7 +28,7 @@
     
     <h3 class="checker" onclick="checkSupport()">Sound Test 🔊</h3>
     <section>
-        <div id="novel-content" class="topcoat-textarea mousetrap">Select a text to read aloud...</div>             
+        <div id="novel-content" class="topcoat-textarea mousetrap">Select a chapter from the dropdown menu and click on the "READ" button to load its contents here...</div>             
         <div id="customise-options">
             <label id="voice-label">
                 Select Voice :
@@ -73,7 +73,7 @@
             <option value="chronicles.txt">Chronicles</option>
             <option value="for god and my love.txt">For God and my Love</option>
             <option value="it is what it is.txt">It Is What It Is</option>
-            <option value="1000 1000 names of lillian.txt">1000 Names of Lillian</option>
+            <option value="1000 names of lillian.txt">1000 Names of Lillian</option>
             <option value="my birthday party.txt">My Birthday Party</option>
             <option value="let sleeping dogs lie.txt">Let Sleeping Dogs Lie</option>
             <option value="love at first sight.txt">Love at First Sight</option>
@@ -120,19 +120,66 @@
     <script type="text/javascript" src="js/mousetrap.min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
     <script>
+        // List of text files in chronological order
+        const textFiles = [
+            "table of contents.txt",
+            "prologue.txt",
+            "acknowledgement.txt",
+            "preface.txt",
+            "aurthors note.txt",
+            "Genesis.txt",
+            "the first valentine gift.txt",
+            "exodus.txt",
+            "the surprise invitation.txt",
+            "lillies siblings.txt",
+            "a friend in need is a friend indeed.txt",
+            "bestie wa me.txt",
+            "the forbidden fruit tastes sweeter.txt",
+            "honey is sweet but bees bite.txt",
+            "valentines day.txt",
+            "party after party.txt",
+            "chronicles.txt",
+            "for god and my love.txt",
+            "it is what it is.txt",
+            "1000 names of lillian.txt",
+            "my birthday party.txt",
+            "let sleeping dogs lie.txt",
+            "love at first sight.txt",
+            "lamentations.txt",
+            "love at last.txt",
+            "MYOB.txt",
+            "Revelation.txt"
+        ];
+    
+        // Index to keep track of the current text file being read
+        let currentIndex = 0;
+    
         function loadText() {
-            let selectElement = document.getElementById('select-text');
-            let selectedText = selectElement.options[selectElement.selectedIndex].value;
-            
-            fetch(selectedText)
+            if (currentIndex >= textFiles.length) {
+                // If all text files have been read, reset to the beginning
+                currentIndex = 0;
+            }
+    
+            // Get the path of the current text file
+            let currentTextFile = textFiles[currentIndex];
+    
+            fetch(currentTextFile)
                 .then(response => response.text())
                 .then(text => {
                     document.getElementById('novel-content').innerText = text;
                     let selectedVoice = document.getElementById('select-voice').value;
-                    responsiveVoice.speak(text, selectedVoice);
+                    responsiveVoice.speak(text, selectedVoice, {
+                        onend: function() {
+                            // Increment index for the next text file
+                            currentIndex++;
+                            // Load the next text file
+                            loadText();
+                        }
+                    });
                 })
                 .catch(error => console.error('Error reading selected text:', error));
         }
     </script>
+    
 </body>
 </html>
