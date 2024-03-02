@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Jesse and Lillian Love Stories</title>
+    <title>Online TTS</title>
     <link rel="stylesheet" type="text/css" href="css/topcoat-mobile-light.min.css">
     <link rel="stylesheet" type="text/css" href="css/styles.css">
 
@@ -21,17 +21,17 @@
     <header>
         <div class="topcoat-navigation-bar">
             <div class="topcoat-navigation-bar__item center full">
-                <h2 class="topcoat-navigation-bar__title">Jesse <span style="color: rgb(255, 0, 0);">❦</span> Lillian </a></h1>
+                <h1 class="topcoat-navigation-bar__title">ONLINE TTS</h1>
             </div>         
         </div>    
     </header>        
     
     <h3 class="checker" onclick="checkSupport()">Sound Test 🔊</h3>
     <section>
-        <div id="novel-content" class="topcoat-textarea mousetrap">Click the "SPEAK" button to access the book contents...</div>             
+        <div id="novel-content" class="topcoat-textarea mousetrap">Select a text to read aloud...</div>             
         <div id="customise-options">
             <label id="voice-label">
-                Select voice :
+                Select Voice :
                 <div id="voice-container">
                     <select id="select-voice">
                         <option value="UK English Female">UK Female</option>
@@ -44,15 +44,51 @@
                 </div>
             </label>   
             <label id="speed-label">
-                Select speech speed :
+                Select Speech Speed :
                 <div id="speed-container">
                     <input id="select-speed" type="range" class="topcoat-range" min="0" max="1.5" value="1" step="0.1" onchange="setSpeed(this.value)">
                 </div>
-            </label>                                  
+            </label>   
+     <!-- Add select element for choosing text files -->
+<label id="text-label">
+    <br>Select Chapter :
+    <div id="text-container">
+        <select id="select-text">
+            <option value="table of contents.txt">Table of Contents</option>
+            <option value="prologue.txt">Prologue</option>
+            <option value="acknowledgement.txt">Acknowledgement</option>
+            <option value="preface.txt">Preface</option>
+            <option value="aurthors note.txt">Author's Note</option>   
+            <option value="Genesis.txt">Genesis</option>
+            <option value="the first valentine gift.txt">The First Valentine Gift</option>
+            <option value="exodus.txt">Exodus</option>
+            <option value="the surprise invitation.txt">The Surprise Invitation</option>
+            <option value="lillies siblings.txt">Lillie's Siblings</option>
+            <option value="a friend in need is a friend indeed.txt">A Friend in Need is a Friend Indeed</option>
+            <option value="bestie wa me.txt">Bestie Wa Me</option>
+            <option value="the forbidden fruit tastes sweeter.txt">The Forbidden Fruit Tastes Sweeter</option>
+            <option value="honey is sweet but bees bite.txt">Honey is Sweet But Bees Bite</option>
+            <option value="valentines day.txt">Valentine's Day</option>
+            <option value="party after party.txt">Party After Party</option>
+            <option value="chronicles.txt">Chronicles</option>
+            <option value="for god and my love.txt">For God and my Love</option>
+            <option value="it is what it is.txt">It Is What It Is</option>
+            <option value="1000 1000 names of lillian.txt">1000 Names of Lillian</option>
+            <option value="my birthday party.txt">My Birthday Party</option>
+            <option value="let sleeping dogs lie.txt">Let Sleeping Dogs Lie</option>
+            <option value="love at first sight.txt">Love at First Sight</option>
+            <option value="lamentations.txt">Lamentations</option>
+            <option value="love at last.txt">Love at Last</option>
+            <option value="MYOB.txt">MYOB</option>
+            <option value="Revelation.txt">Revelation</option>
+        </select>
+    </div>
+</label>                                  
+
         </div>
         <div class="button-row">
             <button id="stop-button" class="topcoat-button" onclick="stopSpeech()">STOP</button>
-            <button id="speak-button" class="topcoat-button--cta" onclick="startSpeech()">SPEAK</button>            
+            <button id="speak-button" class="topcoat-button--cta" onclick="loadText()">READ</button>            
         </div>
         <div id="links">
             <ul>
@@ -68,44 +104,35 @@
         </div>
     </section>
     <br>
-    <!-- Footer -->
-    
-    <footer class="footer" id="contact">
-    
-        <div class="container">
-
-            <p>&copy; Jesse and Family <br>All feelings reserved <span id="currentYear"></span></p>
-
-
+    <footer>
+        <div class="license" style="width:300px;vertical-align:top;font-family: Arial;font-size:9pt;margin:0 auto;line-height: normal">
+            <a rel="license" href="//responsivevoice.org/">
+                <img title="ResponsiveVoice Text To Speech" src="https://responsivevoice.org/wp-content/uploads/2014/08/120x31.png" style="float:left;padding-right:2px" />
+            </a>
+            <span xmlns:dct="https://purl.org/dc/terms/" property="dct:title">
+                <a href="//responsivevoice.org/" target="_blank" title="ResponsiveVoice Text To Speech">ResponsiveVoice</a>
+            </span> used under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" title="Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License">Non-Commercial License</a>
         </div>
-
+        <div style="clear:both;">&nbsp;</div>           
     </footer>
-
-    <!-- End of Footer -->
     <script src="https://code.responsivevoice.org/responsivevoice.js?key=R06QTECg"></script>
     <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
     <script type="text/javascript" src="js/mousetrap.min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
     <script>
-        function startSpeech() {
-    fetch('novel.txt')
-        .then(response => response.text())
-        .then(text => {
-            // Split the text by paragraphs
-            let paragraphs = text.split(/\n\s*\n/);
+        function loadText() {
+            let selectElement = document.getElementById('select-text');
+            let selectedText = selectElement.options[selectElement.selectedIndex].value;
             
-            // Generate HTML for paragraphs
-            let html = paragraphs.map(paragraph => `<p>${paragraph}</p>`).join('');
-            
-            // Display the formatted text in the #novel-content div
-            document.getElementById('novel-content').innerHTML = html;
-            
-            let selectedVoice = document.getElementById('select-voice').value;
-            responsiveVoice.speak(text, selectedVoice);
-        })
-        .catch(error => console.error('Error reading novel.txt:', error));
-}
-
+            fetch(selectedText)
+                .then(response => response.text())
+                .then(text => {
+                    document.getElementById('novel-content').innerText = text;
+                    let selectedVoice = document.getElementById('select-voice').value;
+                    responsiveVoice.speak(text, selectedVoice);
+                })
+                .catch(error => console.error('Error reading selected text:', error));
+        }
     </script>
 </body>
 </html>
