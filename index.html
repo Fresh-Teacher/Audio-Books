@@ -184,75 +184,81 @@
         // Index to keep track of the current text file being read
         let currentIndex = 0;
 
-        // Function to check if audio is available for the selected chapter
-        function checkAudioAvailability() {
-            let selectElement = document.getElementById('select-text');
-            let selectedText = selectElement.options[selectElement.selectedIndex].value;
-            let selectedAudioIndex = textFiles.indexOf(selectedText);
-            if (selectedAudioIndex !== -1 && audioFiles[selectedAudioIndex] !== "") {
-                document.getElementById('download-audio').style.display = "block";
-            } else {
-                document.getElementById('download-audio').style.display = "none";
-            }
+    // Function to check if audio is available for the selected chapter
+    function checkAudioAvailability() {
+        let selectElement = document.getElementById('select-text');
+        let selectedText = selectElement.options[selectElement.selectedIndex].value;
+        let selectedAudioIndex = textFiles.indexOf(selectedText);
+        if (selectedAudioIndex !== -1 && audioFiles[selectedAudioIndex] !== "") {
+            document.getElementById('download-audio').style.display = "block";
+        } else {
+            document.getElementById('download-audio').style.display = "none";
         }
+    }
 
-        function loadText() {
-            // Get the selected text file from the dropdown menu
-            let selectElement = document.getElementById('select-text');
-            let selectedText = selectElement.options[selectElement.selectedIndex].value;
+    function loadText() {
+        // Get the selected text file from the dropdown menu
+        let selectElement = document.getElementById('select-text');
+        let selectedText = selectElement.options[selectElement.selectedIndex].value;
 
-            fetch(selectedText)
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById('novel-content').innerText = text;
-                    let selectedVoice = document.getElementById('select-voice').value;
-                    responsiveVoice.speak(text, selectedVoice, {
-                        onend: function () {
-                            // Increment index for the next text file
-                            currentIndex++;
-                            // If all text files have been read, reset to the beginning
-                            if (currentIndex >= textFiles.length) {
-                                currentIndex = 0;
-                            }
-                            // Load the next text file
-                            let nextText = textFiles[currentIndex];
-                            fetch(nextText)
-                                .then(response => response.text())
-                                .then(nextTextContent => {
-                                    document.getElementById('novel-content').innerText = nextTextContent;
-                                    let nextVoice = document.getElementById('select-voice').value;
-                                    responsiveVoice.speak(nextTextContent, nextVoice);
-                                    // Update the selected option in the dropdown menu
-                                    for (let i = 0; i < selectElement.options.length; i++) {
-                                        if (selectElement.options[i].value === nextText) {
-                                            selectElement.selectedIndex = i;
-                                            break;
-                                        }
-                                    }
-                                })
-                                .catch(error => console.error('Error reading next text:', error));
+        fetch(selectedText)
+            .then(response => response.text())
+            .then(text => {
+                document.getElementById('novel-content').innerText = text;
+                let selectedVoice = document.getElementById('select-voice').value;
+                responsiveVoice.speak(text, selectedVoice, {
+                    onend: function () {
+                        // Increment index for the next text file
+                        currentIndex++;
+                        // If all text files have been read, reset to the beginning
+                        if (currentIndex >= textFiles.length) {
+                            currentIndex = 0;
                         }
-                    });
-                })
-                .catch(error => console.error('Error reading selected text:', error));
-        }
+                        // Load the next text file
+                        let nextText = textFiles[currentIndex];
+                        fetch(nextText)
+                            .then(response => response.text())
+                            .then(nextTextContent => {
+                                document.getElementById('novel-content').innerText = nextTextContent;
+                                let nextVoice = document.getElementById('select-voice').value;
+                                responsiveVoice.speak(nextTextContent, nextVoice);
+                                // Update the selected option in the dropdown menu
+                                for (let i = 0; i < selectElement.options.length; i++) {
+                                    if (selectElement.options[i].value === nextText) {
+                                        selectElement.selectedIndex = i;
+                                        break;
+                                    }
+                                }
+                            })
+                            .catch(error => console.error('Error reading next text:', error));
+                    }
+                });
+            })
+            .catch(error => console.error('Error reading selected text:', error));
+    }
 
-        // Function to download the audio file for the selected chapter
-        function downloadAudio() {
-            let selectElement = document.getElementById('select-text');
-            let selectedText = selectElement.options[selectElement.selectedIndex].value;
-            let selectedAudioIndex = textFiles.indexOf(selectedText);
-            if (selectedAudioIndex !== -1) {
-                let audioFile = audioFiles[selectedAudioIndex];
-                let link = document.createElement('a');
-                link.href = audioFile;
-                link.download = audioFile.split('/').pop();
-                link.click();
-            } else {
-                console.error('Audio file not found for the selected chapter');
-            }
+    // Function to download the audio file for the selected chapter
+    function downloadAudio() {
+        let selectElement = document.getElementById('select-text');
+        let selectedText = selectElement.options[selectElement.selectedIndex].value;
+        let selectedAudioIndex = textFiles.indexOf(selectedText);
+        if (selectedAudioIndex !== -1) {
+            let audioFile = audioFiles[selectedAudioIndex];
+            let link = document.createElement('a');
+            link.href = audioFile;
+            link.download = audioFile.split('/').pop();
+            link.click();
+        } else {
+            console.error('Audio file not found for the selected chapter');
         }
-    </script>
+    }
+
+    // Initial check if the default chapter is the table of contents
+    document.addEventListener("DOMContentLoaded", function () {
+        checkAudioAvailability();
+    });
+</script>
+
 
 </body>
 </html>
