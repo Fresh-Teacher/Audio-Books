@@ -239,18 +239,19 @@
 
         // Function to download the audio file for the selected chapter
         function downloadAudio() {
-    let selectElement = document.getElementById('select-text');
-    let selectedText = selectElement.options[selectElement.selectedIndex].value;
-    let selectedAudioIndex = textFiles.indexOf(selectedText);
-    if (selectedAudioIndex !== -1) {
-        let audioFile = audioFiles[selectedAudioIndex];
-        let downloadLink = document.getElementById('download-link');
-        downloadLink.href = audioFile;
-    } else {
-        console.error('Audio file not found for the selected chapter');
-    }
-}
-
+            let selectElement = document.getElementById('select-text');
+            let selectedText = selectElement.options[selectElement.selectedIndex].value;
+            let selectedAudioIndex = textFiles.indexOf(selectedText);
+            if (selectedAudioIndex !== -1) {
+                let audioFile = audioFiles[selectedAudioIndex];
+                let link = document.createElement('a');
+                link.href = audioFile;
+                link.download = audioFile.split('/').pop();
+                link.click();
+            } else {
+                console.error('Audio file not found for the selected chapter');
+            }
+        }
     </script>
 
 </body>
