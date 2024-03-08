@@ -236,101 +236,113 @@
             "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4"
         ];
 
-        // Index to keep track of the current text file being read
-        let currentIndex = 0;
-
-        // Function to check if audio is available for the selected chapter
-    function checkAudioAvailability() {
-        let selectElement = document.getElementById('select-text');
-        let selectedText = selectElement.options[selectElement.selectedIndex].value;
-        let selectedAudioIndex = textFiles.indexOf(selectedText);
-        if (selectedAudioIndex !== -1 && audioFiles[selectedAudioIndex] !== "") {
-            document.getElementById('download-audio').style.display = "block";
-        } else {
-            document.getElementById('download-audio').style.display = "none";
-        }
-    }
-
         function loadText() {
-            // Get the selected text file from the dropdown menu
-            let selectElement = document.getElementById('select-text');
-            let selectedText = selectElement.options[selectElement.selectedIndex].value;
-            let selectedVoice = document.getElementById('select-voice').value;
+    // Get the selected text file from the dropdown menu
+    let selectElement = document.getElementById('select-text');
+    let selectedText = selectElement.options[selectElement.selectedIndex].value;
+    let selectedVoice = document.getElementById('select-voice').value;
 
-            // Check if the selected voice is "Daniel"
-            if (selectedVoice === 'Daniel') {
-                // Get the index of the selected text file
-                let index = textFiles.indexOf(selectedText);
-                if (index !== -1) {
-                    // Check if the selected chapter has a Google Drive link
-                    let isGoogleDriveLink = audioFiles[index].includes("drive.google.com");
-                    if (isGoogleDriveLink) {
-                        // Display modal warning about Google Drive link with Daniel voice
-                        $('#voiceModal').modal('show');
-                        return; // Stop execution
-                    } else {
-                        // Play the audio associated with the selected text file
-                        let audio = new Audio(audioFiles[index]);
-                        audio.play();
-                    }
-                }
-            } else {
-                fetch(selectedText)
-                    .then(response => response.text())
-                    .then(text => {
-                        document.getElementById('novel-content').innerText = text;
-                        responsiveVoice.speak(text, selectedVoice, {
-                            onend: function() {
-                                // Increment index for the next text file
-                                currentIndex++;
-                                // If all text files have been read, reset to the beginning
-                                if (currentIndex >= textFiles.length) {
-                                    currentIndex = 0;
+    // Check if the selected voice is "Daniel"
+    if (selectedVoice === 'Daniel') {
+        // Get the index of the selected text file
+        let index = textFiles.indexOf(selectedText);
+        if (index !== -1) {
+            // Always fetch the text content regardless of the source of audio
+            fetch(selectedText)
+                .then(response => response.text())
+                .then(text => {
+                    document.getElementById('novel-content').innerText = text;
+                })
+                .catch(error => console.error('Error reading selected text:', error));
+            // Play the audio associated with the selected text file
+            let audio = new Audio(audioFiles[index]);
+            audio.play();
+        }
+    } else {
+        fetch(selectedText)
+            .then(response => response.text())
+            .then(text => {
+                document.getElementById('novel-content').innerText = text;
+                responsiveVoice.speak(text, selectedVoice, {
+                    onend: function() {
+                        // Increment index for the next text file
+                        currentIndex++;
+                        // If all text files have been read, reset to the beginning
+                        if (currentIndex >= textFiles.length) {
+                            currentIndex = 0;
+                        }
+                        // Load the next text file
+                        let nextText = textFiles[currentIndex];
+                        fetch(nextText)
+                            .then(response => response.text())
+                            .then(nextTextContent => {
+                                document.getElementById('novel-content').innerText = nextTextContent;
+                                let nextVoice = document.getElementById('select-voice').value;
+                                responsiveVoice.speak(nextTextContent, nextVoice);
+                                // Update the selected option in the dropdown menu
+                                for (let i = 0; i < selectElement.options.length; i++) {
+                                    if (selectElement.options[i].value === nextText) {
+                                        selectElement.selectedIndex = i;
+                                        break;
+                                    }
                                 }
-                                // Load the next text file
-                                let nextText = textFiles[currentIndex];
-                                fetch(nextText)
-                                    .then(response => response.text())
-                                    .then(nextTextContent => {
-                                        document.getElementById('novel-content').innerText = nextTextContent;
-                                        let nextVoice = document.getElementById('select-voice').value;
-                                        responsiveVoice.speak(nextTextContent, nextVoice);
-                                        // Update the selected option in the dropdown menu
-                                        for (let i = 0; i < selectElement.options.length; i++) {
-                                            if (selectElement.options[i].value === nextText) {
-                                                selectElement.selectedIndex = i;
-                                                break;
-                                            }
-                                        }
-                                    })
-                                    .catch(error => console.error('Error reading next text:', error));
-                            }
-                        });
-                    })
-                    .catch(error => console.error('Error reading selected text:', error));
+                            })
+                            .catch(error => console.error('Error reading next text:', error));
+                    }
+                });
+            })
+            .catch(error => console.error('Error reading selected text:', error));
+    }
+}
+
+
+        function stopSpeech() {
+            // Stop the speech
+            responsiveVoice.cancel();
+        }
+
+        function checkSupport() {
+            // Check if the default voice (Daniel) is selected
+            if (document.getElementById('select-voice').value === 'Daniel') {
+                // Display modal for voice selection
+                $('#voiceModal').modal('show');
+            } else {
+                // Hide the modal
+                $('#voiceModal').modal('hide');
             }
         }
 
-          // Function to download the audio file for the selected chapter
-    function downloadAudio() {
-        let selectElement = document.getElementById('select-text');
-        let selectedText = selectElement.options[selectElement.selectedIndex].value;
-        let selectedAudioIndex = textFiles.indexOf(selectedText);
-        if (selectedAudioIndex !== -1) {
-            let audioFile = audioFiles[selectedAudioIndex];
-            let link = document.createElement('a');
-            link.href = audioFile;
-            link.download = audioFile.split('/').pop();
-            link.click();
-        } else {
-            console.error('Audio file not found for the selected chapter');
+        function setSpeed(speed) {
+            // Set the speech speed
+            responsiveVoice.cancel(); // Stop current speech
+            let voice = document.getElementById('select-voice').value;
+            responsiveVoice.setDefaultRate(speed);
+            if (voice !== 'Daniel') {
+                let text = document.getElementById('novel-content').innerText;
+                responsiveVoice.speak(text, voice, { rate: speed });
+            }
         }
-    }
 
-    // Initial check if the default chapter is the table of contents
-    document.addEventListener("DOMContentLoaded", function () {
-        checkAudioAvailability();
-    });
+        function info() {
+            // Show info about using the TTS
+            alert("Click on the '🔊' icon at the top to enable the use of Online TTS.\n\nOnce enabled, select a chapter from the dropdown menu and click on the 'READ' button to load its contents. You can also adjust the speech speed using the slider.");
+        }
+
+        function downloadAudio() {
+            // Get the selected text file
+            let selectedText = document.getElementById('select-text').value;
+            // Get the index of the selected text file in the textFiles array
+            let index = textFiles.indexOf(selectedText);
+            // Create a temporary anchor element to trigger download
+            let link = document.createElement('a');
+            link.href = audioFiles[index];
+            link.download = selectedText.split('.')[0] + '.mp3';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById("currentYear").innerHTML = new Date().getFullYear();
     </script>
 </body>
 </html>
