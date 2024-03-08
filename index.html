@@ -296,10 +296,14 @@
 }
 
 
-        function stopSpeech() {
-            // Stop the speech
-            responsiveVoice.cancel();
-        }
+function stopSpeech() {
+    // Stop the ResponsiveVoice speech
+    responsiveVoice.cancel();
+
+    // Reload the page to stop any audio playback from links
+    location.reload();
+}
+
 
         function checkSupport() {
             // Check if the default voice (Daniel) is selected
