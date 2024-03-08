@@ -34,7 +34,7 @@
     <section>
         <div id="customise-options">
             <br><label id="voice-label">
-                SELECT VOICE:
+                Select Voice :
                 <div id="voice-container">
                     <select id="select-voice">
                         <option value="Daniel">Default Voice</option>
@@ -50,15 +50,15 @@
                 </div>
                 
             </label>   
-            <!-- <label id="speed-label">
+            <label id="speed-label">
                 Select Speech Speed :
                 <div id="speed-container">
                     <input id="select-speed" type="range" class="topcoat-range" min="0" max="1.5" value="1" step="0.1" onchange="setSpeed(this.value)">
                 </div>
-            </label>    -->
+            </label>   
      <!-- Add select element for choosing text files -->
 <label id="text-label">
-    <br><b>SELECT CHAPTER:</b>
+    <br><b>Select Chapter :</b>
     <div id="text-container">
         <select id="select-text">
             <option value="table of contents.txt">Table of Contents</option>
@@ -92,15 +92,7 @@
     </div>
 </label>                                  
 
-        </div><br>
-       <center> <label id="playback-mode-label">
-        <b>SELECT MODE:</b><br>
-            <select id="select-playback-mode">
-                <option value="repeat">Repeat Mode</option>
-                <option value="shuffle">Shuffle Mode</option>
-            </select>
-        </label>
-        </center>
+        </div>
         <div class="button-row">
             <button id="stop-button" class="topcoat-button" onclick="stopSpeech()">STOP</button>
             <button id="speak-button" class="topcoat-button--cta" onclick="loadText()">READ</button>            
@@ -161,7 +153,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="selectAlternativeVoice()">SELECT VOICE</button>
+                <button type="button" class="btn btn-primary" onclick="selectAlternativeVoice()">Select Voice</button>
             </div>
         </div>
     </div>
@@ -181,8 +173,6 @@
             // Hide the modal
             $('#voiceModal').modal('hide');
         }
-
-        
 
         // List of text files in chronological order
         const textFiles = [
@@ -246,41 +236,12 @@
             "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4"
         ];
 
-        // Function to shuffle arrays in sync
-function shuffleArrays(arrays) {
-    // Get the length of the shortest array
-    const length = Math.min(...arrays.map(arr => arr.length));
-    // Shuffle arrays in sync
-    for (let i = length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        for (let arr of arrays) {
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    }
-}
-
-// Shuffle both textFiles and audioFiles arrays
-shuffleArrays([textFiles, audioFiles]);
-
-
-// Function to determine the playback mode selected by the user
-function getPlaybackMode() {
-    let selectElement = document.getElementById('select-playback-mode');
-    return selectElement.value;
-}
-
-// Function to load and play the next chapter based on the playback mode
-function loadAndPlayNextChapter(currentIndex, playbackMode) {
-    if (playbackMode === 'shuffle') {
-        currentIndex = Math.floor(Math.random() * textFiles.length); // Choose a random index
-    } else if (playbackMode === 'repeat') {
-        // Do nothing to repeat the same chapter
-    } else {
-        currentIndex++; // Increment index for sequential playback
-        // If all text files have been read, reset to the beginning
-        if (currentIndex >= textFiles.length) {
-            currentIndex = 0;
-        }
+// Function to load and play the next chapter
+function loadAndPlayNextChapter(currentIndex) {
+    currentIndex++;
+    // If all text files have been read, reset to the beginning
+    if (currentIndex >= textFiles.length) {
+        currentIndex = 0;
     }
     // Load the next text file
     let nextText = textFiles[currentIndex];
@@ -300,11 +261,10 @@ function loadAndPlayNextChapter(currentIndex, playbackMode) {
             let audio = new Audio(audioFiles[currentIndex]);
             audio.play();
             // When the audio ends, load and play the next chapter
-            audio.addEventListener('ended', () => loadAndPlayNextChapter(currentIndex, playbackMode));
+            audio.addEventListener('ended', () => loadAndPlayNextChapter(currentIndex));
         })
         .catch(error => console.error('Error reading next text:', error));
 }
-
 
 // Function to load and play the selected chapter
 function loadText() {
@@ -325,10 +285,8 @@ function loadText() {
         // Play the audio associated with the selected text file
         let audio = new Audio(audioFiles[index]);
         audio.play();
-        // Determine the playback mode selected by the user
-        let playbackMode = getPlaybackMode();
-        // When the audio ends, load and play the next chapter based on the playback mode
-        audio.addEventListener('ended', () => loadAndPlayNextChapter(index, playbackMode));
+        // When the audio ends, load and play the next chapter
+        audio.addEventListener('ended', () => loadAndPlayNextChapter(index));
     }
 }
 
