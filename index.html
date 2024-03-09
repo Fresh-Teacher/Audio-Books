@@ -328,7 +328,7 @@ function loadText() {
                             if (repeatOption === 'next') {
                                 loadAndPlayNextChapter(index);
                             } else {
-                                responsiveVoice.speak(text, selectedVoice, { onend: () => loadText() }); // Pass index to onend callback
+                                loadText(); // Repeat the current chapter
                             }
                         });
                     }
