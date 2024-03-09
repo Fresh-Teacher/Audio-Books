@@ -413,10 +413,11 @@ function stopSpeech() {
             }
         }
 
-        function info() {
-            // Show info about using the TTS
-            alert("Click on the '🔊' icon at the top to enable the use of Online TTS.\n\nOnce enabled, select a chapter from the dropdown menu and click on the 'READ' button to load its contents. You can also adjust the speech speed using the slider.");
-        }
+function info() {
+    // Show info about using the TTS
+    alert("Guide: \n\n<b>1. Voice Selection:</b> You can choose your preferred voice for text-to-speech conversion by selecting from the dropdown menu labelled 'Select Voice.' The available voices include options such as USA Female Voice, USA Male Voice, UK Female Voice, etc.\n\n<b>3. Playback Mode:</b> You may choose between two playback modes: 'Repeat One' and 'Loop All' from the dropdown menu labelled 'Playback Mode.' 'Repeat One' repeats the current chapter continuously, while 'Loop All' automatically moves to the next chapter after the current one finishes.\n\n<b>4. Chapter Selection:</b> You can select the desired chapter from the dropdown menu labelled 'Select Chapter.' The available chapters are listed in chronological order, making it easy for you to find and select the chapter you wanna to listen to.\n\n<b>5. Playback Controls:</b> The 'READ' button initiates the text-to-speech conversion for the selected chapter. The 'STOP' button allows you to stop the speech playback at any time.\n\n<b>6. Additional Features:</b> You may access additional features and information by clicking on the icons of Jesse and Lillian, which may include options for customisation or navigation.\n\n<b>7. Audio Download Option:</b> You also have the option to download the audio file corresponding to the selected chapter by clicking on the 'Download 🔊' button.\n\n<b>8. Footer:</b> The footer contains information about the creators or owners of the application, adding credibility and transparency to the platform. It also displays the copyright information. Please be informed about copyright infringement!\n\n<b>9. Modal Dialogs:</b> Modal dialogs are used to provide additional information or notifications, such as informing users when the default voice is not supported for a particular chapter and suggesting alternative voices. \n\nEnjoy the experience! 😊");
+}
+
 
         function downloadAudio() {
             // Get the selected text file
