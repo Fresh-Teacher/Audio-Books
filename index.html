@@ -237,7 +237,7 @@ function selectAlternativeVoice() {
             "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4",
             "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4",
             "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4",
-            "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4"
+            "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4",
         ];
 
         // Function to check if audio is available for the selected chapter
@@ -285,6 +285,7 @@ function loadAndPlayNextChapter(currentIndex) {
 
 
 // Function to load and play the selected chapter
+// Function to load and play the selected chapter
 function loadText() {
     // Get the selected text file from the dropdown menu
     let selectElement = document.getElementById('select-text');
@@ -313,35 +314,16 @@ function loadText() {
                         // Play the audio associated with the selected text file
                         let audio = new Audio(audioFiles[index]);
                         audio.play();
+                        // When the audio ends, load and play the next chapter
+                        audio.addEventListener('ended', () => loadAndPlayNextChapter(index));
                     }
                 }
             } else {
                 // Speak the text content using responsive voice
                 responsiveVoice.speak(text, selectedVoice, {
                     onend: function () {
-                        // Increment index for the next text file
-                        currentIndex++;
-                        // If all text files have been read, reset to the beginning
-                        if (currentIndex >= textFiles.length) {
-                            currentIndex = 0;
-                        }
-                        // Load the next text file
-                        let nextText = textFiles[currentIndex];
-                        fetch(nextText)
-                            .then(response => response.text())
-                            .then(nextTextContent => {
-                                document.getElementById('novel-content').innerText = nextTextContent;
-                                let nextVoice = document.getElementById('select-voice').value;
-                                responsiveVoice.speak(nextTextContent, nextVoice);
-                                // Update the selected option in the dropdown menu
-                                for (let i = 0; i < selectElement.options.length; i++) {
-                                    if (selectElement.options[i].value === nextText) {
-                                        selectElement.selectedIndex = i;
-                                        break;
-                                    }
-                                }
-                            })
-                            .catch(error => console.error('Error reading next text:', error));
+                        // Load and play the next chapter
+                        loadAndPlayNextChapter(index);
                     }
                 });
             }
@@ -349,8 +331,35 @@ function loadText() {
         .catch(error => console.error('Error reading selected text:', error));
 }
 
-
-
+// Function to load and play the next chapter
+function loadAndPlayNextChapter(currentIndex) {
+    currentIndex++;
+    // If all text files have been read, reset to the beginning
+    if (currentIndex >= textFiles.length) {
+        currentIndex = 0;
+    }
+    // Load the next text file
+    let nextText = textFiles[currentIndex];
+    fetch(nextText)
+        .then(response => response.text())
+        .then(nextTextContent => {
+            document.getElementById('novel-content').innerText = nextTextContent;
+            // Update the selected option in the dropdown menu
+            let selectElement = document.getElementById('select-text');
+            for (let i = 0; i < selectElement.options.length; i++) {
+                if (selectElement.options[i].value === nextText) {
+                    selectElement.selectedIndex = i;
+                    break;
+                }
+            }
+            // Play the audio associated with the selected text file
+            let audio = new Audio(audioFiles[currentIndex]);
+            audio.play();
+            // When the audio ends, load and play the next chapter
+            audio.addEventListener('ended', () => loadAndPlayNextChapter(currentIndex));
+        })
+        .catch(error => console.error('Error reading next text:', error));
+}
 
 
 function stopSpeech() {
