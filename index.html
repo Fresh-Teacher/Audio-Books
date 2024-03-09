@@ -165,14 +165,18 @@
     <script type="text/javascript" src="js/mousetrap.min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
     <script>
-        function selectAlternativeVoice() {
-            // Get the selected voice from the modal dropdown menu
-            let selectedVoice = document.getElementById('select-voice-modal').value;
-            // Set the selected voice in the main select voice dropdown menu
-            document.getElementById('select-voice').value = selectedVoice;
-            // Hide the modal
-            $('#voiceModal').modal('hide');
-        }
+        
+function selectAlternativeVoice() {
+    // Get the selected voice from the modal dropdown menu
+    let selectedVoice = document.getElementById('select-voice-modal').value;
+    // Set the selected voice in the main select voice dropdown menu
+    document.getElementById('select-voice').value = selectedVoice;
+    // Hide the modal
+    $('#voiceModal').modal('hide');
+    // Load text with the selected alternative voice
+    loadText();
+}
+
 
         // List of text files in chronological order
         const textFiles = [
@@ -233,7 +237,7 @@
             "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4",
             "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4",
             "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4",
-            "https://drive.google.com/uc?export=download&id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4"
+            "https://drive.usercontent.google.com/download?id=1NtlqDx6kpeS6s0Xv6LFdOR7ZajEK4j_4&export=download&authuser=0&confirm=t&uuid=b22ceb55-44f4-442e-81f4-69fe817ca121&at=APZUnTWi1M99Am-w2iozhHGlJliD%3A1709961740971"
         ];
 
         // Function to check if audio is available for the selected chapter
@@ -248,6 +252,7 @@
         }
     }
 
+// Function to load and play the next chapter
 // Function to load and play the next chapter
 function loadAndPlayNextChapter(currentIndex) {
     currentIndex++;
@@ -278,29 +283,73 @@ function loadAndPlayNextChapter(currentIndex) {
         .catch(error => console.error('Error reading next text:', error));
 }
 
+
 // Function to load and play the selected chapter
 function loadText() {
     // Get the selected text file from the dropdown menu
     let selectElement = document.getElementById('select-text');
     let selectedText = selectElement.options[selectElement.selectedIndex].value;
+    let selectedVoice = document.getElementById('select-voice').value;
 
-    // Get the index of the selected text file
-    let index = textFiles.indexOf(selectedText);
-    if (index !== -1) {
-        // Load the text content
-        fetch(selectedText)
-            .then(response => response.text())
-            .then(text => {
-                document.getElementById('novel-content').innerText = text;
-            })
-            .catch(error => console.error('Error reading selected text:', error));
-        // Play the audio associated with the selected text file
-        let audio = new Audio(audioFiles[index]);
-        audio.play();
-        // When the audio ends, load and play the next chapter
-        audio.addEventListener('ended', () => loadAndPlayNextChapter(index));
-    }
+    // Load the text content from the selected text file
+    fetch(selectedText)
+        .then(response => response.text())
+        .then(text => {
+            // Display the text content on the page
+            document.getElementById('novel-content').innerText = text;
+
+            // If the selected voice is "Daniel"
+            if (selectedVoice === 'Daniel') {
+                // Get the index of the selected text file
+                let index = textFiles.indexOf(selectedText);
+                if (index !== -1) {
+                    // Check if the selected chapter has a Google Drive link
+                    let isGoogleDriveLink = audioFiles[index].includes("drive.google.com");
+                    if (isGoogleDriveLink) {
+                        // Display modal warning about Google Drive link with Daniel voice
+                        $('#voiceModal').modal('show');
+                        return; // Stop execution
+                    } else {
+                        // Play the audio associated with the selected text file
+                        let audio = new Audio(audioFiles[index]);
+                        audio.play();
+                    }
+                }
+            } else {
+                // Speak the text content using responsive voice
+                responsiveVoice.speak(text, selectedVoice, {
+                    onend: function () {
+                        // Increment index for the next text file
+                        currentIndex++;
+                        // If all text files have been read, reset to the beginning
+                        if (currentIndex >= textFiles.length) {
+                            currentIndex = 0;
+                        }
+                        // Load the next text file
+                        let nextText = textFiles[currentIndex];
+                        fetch(nextText)
+                            .then(response => response.text())
+                            .then(nextTextContent => {
+                                document.getElementById('novel-content').innerText = nextTextContent;
+                                let nextVoice = document.getElementById('select-voice').value;
+                                responsiveVoice.speak(nextTextContent, nextVoice);
+                                // Update the selected option in the dropdown menu
+                                for (let i = 0; i < selectElement.options.length; i++) {
+                                    if (selectElement.options[i].value === nextText) {
+                                        selectElement.selectedIndex = i;
+                                        break;
+                                    }
+                                }
+                            })
+                            .catch(error => console.error('Error reading next text:', error));
+                    }
+                });
+            }
+        })
+        .catch(error => console.error('Error reading selected text:', error));
 }
+
+
 
 
 
