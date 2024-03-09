@@ -307,10 +307,11 @@ function loadText() {
             // Display the text content on the page
             document.getElementById('novel-content').innerText = text;
 
+            // Get the index of the selected text file
+            let index = textFiles.indexOf(selectedText);
+
             // If the selected voice is "Daniel"
             if (selectedVoice === 'Daniel') {
-                // Get the index of the selected text file
-                let index = textFiles.indexOf(selectedText);
                 if (index !== -1) {
                     // Check if the selected chapter has a Google Drive link
                     let isGoogleDriveLink = audioFiles[index].includes("drive.google.com");
@@ -327,8 +328,7 @@ function loadText() {
                             if (repeatOption === 'next') {
                                 loadAndPlayNextChapter(index);
                             } else {
-                                audio.currentTime = 0;
-                                audio.play();
+                                responsiveVoice.speak(text, selectedVoice, { onend: () => loadText() }); // Pass index to onend callback
                             }
                         });
                     }
@@ -351,8 +351,9 @@ function loadText() {
 }
 
 
-// Function to load and play the next chapter
-function loadAndPlayNextChapter(currentIndex) {
+
+/// Function to load and play the next chapter
+function loadAndPlayNextChapter(currentIndex, selectedVoice) {
     currentIndex++;
     // If all text files have been read, reset to the beginning
     if (currentIndex >= textFiles.length) {
@@ -376,10 +377,88 @@ function loadAndPlayNextChapter(currentIndex) {
             let audio = new Audio(audioFiles[currentIndex]);
             audio.play();
             // When the audio ends, load and play the next chapter
-            audio.addEventListener('ended', () => loadAndPlayNextChapter(currentIndex));
+            audio.addEventListener('ended', () => loadAndPlayNextChapter(currentIndex, selectedVoice));
         })
         .catch(error => console.error('Error reading next text:', error));
 }
+
+// Function to load and play the selected chapter
+function loadText() {
+    // Get the selected text file from the dropdown menu
+    let selectElement = document.getElementById('select-text');
+    let selectedText = selectElement.options[selectElement.selectedIndex].value;
+    let repeatOption = document.getElementById('select-repeat').value;
+
+    // Load the text content from the selected text file
+    fetch(selectedText)
+        .then(response => response.text())
+        .then(text => {
+            // Display the text content on the page
+            document.getElementById('novel-content').innerText = text;
+
+            // Get the index of the selected text file
+            let index = textFiles.indexOf(selectedText);
+
+            // Get the previously selected voice from localStorage
+            let selectedVoice = localStorage.getItem('selectedVoice');
+
+            // If the selected voice is "Daniel"
+            if (selectedVoice === 'Daniel') {
+                if (index !== -1) {
+                    // Check if the selected chapter has a Google Drive link
+                    let isGoogleDriveLink = audioFiles[index].includes("drive.google.com");
+                    if (isGoogleDriveLink) {
+                        // Display modal warning about Google Drive link with Daniel voice
+                        $('#voiceModal').modal('show');
+                        return; // Stop execution
+                    } else {
+                        // Play the audio associated with the selected text file
+                        let audio = new Audio(audioFiles[index]);
+                        audio.play();
+                        // When the audio ends, load and play the next chapter or repeat the current chapter
+                        audio.addEventListener('ended', () => {
+                            if (repeatOption === 'next') {
+                                loadAndPlayNextChapter(index, selectedVoice); // Pass selectedVoice
+                            } else {
+                                responsiveVoice.speak(text, selectedVoice, { onend: () => loadText() }); // Pass index to onend callback
+                            }
+                        });
+                    }
+                }
+            } else {
+                // Speak the text content using responsive voice
+                responsiveVoice.speak(text, selectedVoice, {
+                    onend: function () {
+                        // Load and play the next chapter or repeat the current chapter
+                        if (repeatOption === 'next') {
+                            loadAndPlayNextChapter(index, selectedVoice);
+                        } else {
+                            responsiveVoice.speak(text, selectedVoice);
+                        }
+                    }
+                });
+            }
+        })
+        .catch(error => console.error('Error reading selected text:', error));
+}
+
+// Event listener for voice selection
+document.getElementById('select-voice').addEventListener('change', function() {
+    let selectedVoice = this.value;
+    localStorage.setItem('selectedVoice', selectedVoice); // Store selected voice in localStorage
+});
+
+// Initial check if the default chapter is the table of contents
+document.addEventListener("DOMContentLoaded", function () {
+    // Check if there's a previously selected voice in localStorage
+    let selectedVoice = localStorage.getItem('selectedVoice');
+    if (selectedVoice) {
+        // Set the selected voice in the dropdown menu
+        document.getElementById('select-voice').value = selectedVoice;
+    }
+    checkAudioAvailability();
+});
+
 
 
 function stopSpeech() {
@@ -415,7 +494,7 @@ function stopSpeech() {
 
         function info() {
             // Show info about using the TTS
-    alert("GUIDELINES: \n1. Voice Selection: You can choose your preferred voice for text-to-speech conversion by selecting from the dropdown menu labelled 'Select Voice.' The available voices include options such as USA Female Voice, USA Male Voice, UK Female Voice, etc.\n\n3. Playback Mode: You may choose between two playback modes: 'Repeat One' and 'Loop All' from the dropdown menu labelled 'Playback Mode.' 'Repeat One' repeats the current chapter continuously, while 'Loop All' automatically moves to the next chapter after the current one finishes.\n\n4. Chapter Selection: You can select the desired chapter from the dropdown menu labelled 'Select Chapter.' The available chapters are listed in chronological order, making it easy for you to find and select the chapter you wanna to listen to.\n\n5. Playback Controls: The 'READ' button initiates the text-to-speech conversion for the selected chapter. The 'STOP' button allows you to stop the speech playback at any time. The 'DOWNLOAD' button saves the current chapter to your device.\n\n6. Additional Features: You may access additional information by clicking on the icon of Jesse and Lillian.");
+    alert("GUIDELINES: \n1. Voice Selection: You can choose your preferred voice for text-to-speech conversion by selecting from the dropdown menu labelled 'Select Voice.' The available voices include options such as USA Female Voice, USA Male Voice, UK Female Voice, etc.\n\n3. Playback Mode: You may choose between two playback modes: 'Repeat One' and 'Loop All' from the dropdown menu labelled 'Playback Mode.' 'Repeat One' repeats the current chapter continuously, while 'Loop All' automatically moves to the next chapter after the current one finishes.\n\n4. Chapter Selection: You can select the desired chapter from the dropdown menu labelled 'Select Chapter.' The available chapters are listed in chronological order, making it easy for you to find and select the chapter you wanna to listen to.\n\n5. Playback Controls: The 'READ' button initiates the text-to-speech conversion for the selected chapter. The 'STOP' button allows you to stop the speech playback at any time.\n\n6. Additional Features: You may access additional information by clicking on the icon of Jesse and Lillian. \n\nEnjoy the experience! 😊");
         }
 
         function downloadAudio() {
