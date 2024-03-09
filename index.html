@@ -34,8 +34,8 @@
     <section>
         <div id="customise-options">
             <br><label id="voice-label">
-                Select Voice :
-                <div id="voice-container">
+               
+                <div id="voice-container"> Select Voice :
                     <select id="select-voice">
                         <option value="Daniel">Default Voice</option>
                         <option value="UK English Female">USA Female Voice</option>
@@ -47,15 +47,24 @@
                         <option value="Japanese Female">Japanese Female Voice</option>
                         <option value="Korean Female">Korean Female Voice</option>
                     </select>                      
-                </div>
+                </div><br>
+                <label id="repeat-label">
+                    <b>Playback Mode:</b>
+                    <div id="repeat-container">
+                        <select id="select-repeat">
+                            <option value="repeat">Repeat One</option>
+                            <option value="next">Loop All</option>
+                        </select>                      
+                    </div>
+                </label>
                 
             </label>   
-            <label id="speed-label">
+            <!-- <label id="speed-label">
                 Select Speech Speed :
                 <div id="speed-container">
                     <input id="select-speed" type="range" class="topcoat-range" min="0" max="1.5" value="1" step="0.1" onchange="setSpeed(this.value)">
                 </div>
-            </label>   
+            </label>    -->
      <!-- Add select element for choosing text files -->
 <label id="text-label">
     <br><b>Select Chapter :</b>
@@ -253,7 +262,6 @@ function selectAlternativeVoice() {
     }
 
 // Function to load and play the next chapter
-// Function to load and play the next chapter
 function loadAndPlayNextChapter(currentIndex) {
     currentIndex++;
     // If all text files have been read, reset to the beginning
@@ -285,12 +293,12 @@ function loadAndPlayNextChapter(currentIndex) {
 
 
 // Function to load and play the selected chapter
-// Function to load and play the selected chapter
 function loadText() {
     // Get the selected text file from the dropdown menu
     let selectElement = document.getElementById('select-text');
     let selectedText = selectElement.options[selectElement.selectedIndex].value;
     let selectedVoice = document.getElementById('select-voice').value;
+    let repeatOption = document.getElementById('select-repeat').value;
 
     // Load the text content from the selected text file
     fetch(selectedText)
@@ -314,22 +322,34 @@ function loadText() {
                         // Play the audio associated with the selected text file
                         let audio = new Audio(audioFiles[index]);
                         audio.play();
-                        // When the audio ends, load and play the next chapter
-                        audio.addEventListener('ended', () => loadAndPlayNextChapter(index));
+                        // When the audio ends, load and play the next chapter or repeat the current chapter
+                        audio.addEventListener('ended', () => {
+                            if (repeatOption === 'next') {
+                                loadAndPlayNextChapter(index);
+                            } else {
+                                audio.currentTime = 0;
+                                audio.play();
+                            }
+                        });
                     }
                 }
             } else {
                 // Speak the text content using responsive voice
                 responsiveVoice.speak(text, selectedVoice, {
                     onend: function () {
-                        // Load and play the next chapter
-                        loadAndPlayNextChapter(index);
+                        // Load and play the next chapter or repeat the current chapter
+                        if (repeatOption === 'next') {
+                            loadAndPlayNextChapter(index);
+                        } else {
+                            responsiveVoice.speak(text, selectedVoice);
+                        }
                     }
                 });
             }
         })
         .catch(error => console.error('Error reading selected text:', error));
 }
+
 
 // Function to load and play the next chapter
 function loadAndPlayNextChapter(currentIndex) {
